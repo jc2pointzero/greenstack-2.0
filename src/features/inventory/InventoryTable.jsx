@@ -1,59 +1,44 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
-const DraggableSeed = ({ seed }) => {
+function DraggableSeed({ seed }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: seed.id,
   });
 
   const style = {
-    padding: '12px',
-    margin: '8px 0',
-    background: '#fff',
-    border: isDragging ? '2px solid #2e7d32' : '1px solid #e0e0e0',
-    borderRadius: '8px',
+    padding: '10px',
+    margin: '5px 0',
+    background: '#1a1a1a',
+    border: '1px solid #333',
+    borderRadius: '6px',
     cursor: 'grab',
-    opacity: isDragging ? 0.4 : 1,
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+    opacity: isDragging ? 0.5 : 1,
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '13px'
   };
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <div style={{ fontWeight: 'bold', color: '#1b5e20', fontSize: '14px' }}>{seed.name}</div>
-      <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase' }}>{seed.type}</div>
-    </div>
-  );
-};
-
-export default function InventoryTable({ seedBank = [] }) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredSeeds = (seedBank || []).filter(seed => {
-    const search = searchTerm.toLowerCase();
-    return seed.name.toLowerCase().includes(search) || seed.type.toLowerCase().includes(search);
-  });
-
-  return (
-    <div style={containerStyle}>
-      <div style={headerStyle}>
-        <h3 style={{ margin: '0 0 12px 0', color: '#1b5e20' }}>Seed Vault</h3>
-        <input 
-          type="text" 
-          placeholder="Search genetics..." 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={searchInputStyle}
-        />
-      </div>
-      <div style={{ overflowY: 'auto', flexGrow: 1, padding: '5px' }}>
-        {filteredSeeds.map(seed => (
-          <DraggableSeed key={seed.id} seed={seed} />
-        ))}
-      </div>
+      <span style={{ fontSize: '16px' }}>🌱</span>
+      {seed.name}
     </div>
   );
 }
 
-const containerStyle = { background: '#f5f5f5', padding: '15px', borderRadius: '12px', border: '1px solid #ddd', height: '80vh', display: 'flex', flexDirection: 'column' };
-const headerStyle = { position: 'sticky', top: 0, background: '#f5f5f5', zIndex: 1, paddingBottom: '10px' };
-const searchInputStyle = { width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', boxSizing: 'border-box', outline: 'none' };
+export default function InventoryTable({ seedBank }) {
+  return (
+    <div style={{ background: '#111', padding: '15px', borderRadius: '12px', border: '1px solid #333' }}>
+      <h3 style={{ margin: '0 0 15px 0', color: '#4caf50', fontSize: '14px', textTransform: 'uppercase' }}>Seed Vault</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        {seedBank.map((seed) => (
+          <DraggableSeed key={seed.id} seed={seed} />
+        ))}
+        {seedBank.length === 0 && <small style={{ color: '#444' }}>No seeds in vault...</small>}
+      </div>
+    </div>
+  );
+}

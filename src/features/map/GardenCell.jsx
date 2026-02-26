@@ -2,48 +2,87 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
 export default function GardenCell({ coord, plant, onRemove, isIslandTop }) {
-  const { setNodeRef, isOver } = useDroppable({ id: coord });
-
-  const getPlantIcon = (p) => {
-    const name = p.name.toLowerCase();
-    if (name.includes('tomato')) return '🍅';
-    if (name.includes('pepper')) return '🫑';
-    if (name.includes('cucumber') || name.includes('zucchini')) return '🥒';
-    if (name.includes('banner') || name.includes('cookies') || name.includes('og')) return '🌿';
-    return '🌱';
-  };
+  const { isOver, setNodeRef } = useDroppable({
+    id: coord,
+  });
 
   const cellStyle = {
     width: '80px',
     height: '80px',
-    // Highlight the "Island Top" with a subtle glow or different border
-    background: isOver ? '#2e7d32' : (isIslandTop ? '#222' : '#111'),
-    border: isIslandTop ? '2px solid #4caf50' : '1px solid #333',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: isOver ? '#2e7d32' : '#111',
+    border: isIslandTop ? '2px solid #ffeb3b' : '1px solid #333',
+    position: 'relative', // 🔥 CRITICAL: Creates a new stacking context
+    transition: 'background 0.2s ease',
+    fontSize: '10px',
+    color: '#444',
+  };
+
+  const plantStyle = {
+    width: '60px',
+    height: '60px',
+    background: '#1a1a1a',
+    border: '2px solid #4caf50',
+    borderRadius: '8px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
-    transition: 'all 0.2s ease',
-    boxShadow: isIslandTop ? 'inset 0 0 10px rgba(76, 175, 80, 0.2)' : 'none'
+    alignItems: 'center',
+    cursor: 'grab',
+    position: 'absolute',
+    zIndex: 10, // 🔥 CRITICAL: Keeps plant ABOVE the grid lines
+    boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
+    textAlign: 'center',
+    padding: '4px',
+    userSelect: 'none'
+  };
+
+  const removeBtnStyle = {
+    position: 'absolute',
+    top: '-5px',
+    right: '-5px',
+    background: '#d32f2f',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '50%',
+    width: '18px',
+    height: '18px',
+    fontSize: '12px',
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20, // 🔥 ABOVE the plant icon
   };
 
   return (
     <div ref={setNodeRef} style={cellStyle}>
-      {plant ? (
-        <>
-          <span style={{ fontSize: '28px' }}>{getPlantIcon(plant)}</span>
-          <span style={labelStyle}>{plant.name}</span>
-          <button onClick={onRemove} style={deleteBtnStyle}>✕</button>
-        </>
-      ) : (
-        <span style={{ color: isIslandTop ? '#4caf50' : '#444', fontSize: '10px' }}>
-          {isIslandTop ? 'TOP' : coord}
-        </span>
+      {!plant && coord}
+      {plant && (
+        <div style={plantStyle}>
+          {onRemove && (
+            <button style={removeBtnStyle} onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}>✕</button>
+          )}
+          <span style={{ fontSize: '18px' }}>🌱</span>
+          <div style={{ 
+            color: '#fff', 
+            fontSize: '9px', 
+            fontWeight: 'bold', 
+            marginTop: '2px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: '100%'
+          }}>
+            {plant.name}
+          </div>
+        </div>
       )}
     </div>
   );
 }
-
-const labelStyle = { fontSize: '9px', textAlign: 'center', color: '#81c784', fontWeight: 'bold', marginTop: '4px' };
-const deleteBtnStyle = { position: 'absolute', top: '2px', right: '2px', background: '#d32f2f', color: 'white', border: 'none', borderRadius: '50%', width: '16px', height: '16px', cursor: 'pointer', fontSize: '10px' };
